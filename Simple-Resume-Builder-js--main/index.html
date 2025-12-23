@@ -1,109 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Resume Builder</title>
+    <title>AI Resume Builder | Create Professional Resumes Instantly</title>
+    <meta name="description"
+        content="Build a professional, modern resume in minutes with our free AI-powered Resume Builder. Real-time preview and PDF export included.">
+    <meta name="keywords" content="resume builder, cv maker, professional resume, free resume creator, job application">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <header class="site-header">
-        <h1>Professional Resume Builder</h1>
-        <button id="dark-mode-toggle">🌙 Dark Mode</button>
+        <h1>Resume Builder</h1>
+        <button id="dark-mode-toggle" aria-label="Toggle Dark Mode">
+            <span>🌙</span> Dark Mode
+        </button>
     </header>
 
-    <div class="container">
-        <div id="input-form">
-            <h2>Personal Information</h2>
-            <label for="name">Full Name:</label>
-            <input type="text" id="name" placeholder="John Doe"><br>
+    <main class="container">
+        <!-- Form Section -->
+        <section id="input-form">
+            <h2><span>👤</span> Personal Information</h2>
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="Johnathan Doe" autocomplete="name">
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="john@example.com" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" placeholder="+1 (555) 000-0000" autocomplete="tel">
+            </div>
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" placeholder="john.doe@example.com"><br>
+            <h2><span>🔗</span> Social Links</h2>
+            <div class="form-group">
+                <label for="linkedin">LinkedIn URL</label>
+                <input type="url" id="linkedin" placeholder="https://linkedin.com/in/johndoe">
+            </div>
+            <div class="form-group">
+                <label for="github">GitHub URL</label>
+                <input type="url" id="github" placeholder="https://github.com/johndoe">
+            </div>
+            <div class="form-group">
+                <label for="portfolio">Portfolio URL</label>
+                <input type="url" id="portfolio" placeholder="https://johndoe.com">
+            </div>
 
-            <label for="phone">Phone:</label>
-            <input type="tel" id="phone" placeholder="(123) 456-7890"><br>
+            <h2><span>📝</span> Professional Summary</h2>
+            <textarea id="summary" rows="4"
+                placeholder="Craft a compelling summary of your career and skills..."></textarea>
 
-            <h2>Social Links</h2>
-            <label for="linkedin">LinkedIn:</label>
-            <input type="url" id="linkedin" placeholder="https://linkedin.com/in/johndoe"><br>
-            <label for="github">GitHub:</label>
-            <input type="url" id="github" placeholder="https://github.com/johndoe"><br>
-            <label for="portfolio">Portfolio:</label>
-            <input type="url" id="portfolio" placeholder="https://johndoe.com"><br>
-
-            <h2>Summary / Objective</h2>
-            <textarea id="summary" rows="3" placeholder="A brief professional summary..."></textarea><br>
-
-            <h2>Experience</h2>
+            <h2><span>💼</span> Experience</h2>
             <div id="experience-container">
-                <div class="entry-input">
-                    <label for="job-title-0">Job Title:</label>
-                    <input type="text" id="job-title-0" placeholder="Senior Developer"><br>
-                    <label for="company-0">Company:</label>
-                    <input type="text" id="company-0" placeholder="Tech Solutions Inc."><br>
-                    <label for="exp-details-0">Details/Achievements:</label>
-                    <textarea id="exp-details-0" rows="2" placeholder="Key responsibilities and achievements..."></textarea><br>
-                    <button onclick="removeExperience(0)" class="remove-btn">Remove</button>
-                </div>
+                <!-- Initial entries will be handled by JS or can be empty -->
             </div>
-            <button onclick="addExperience()" class="add-btn">Add Another Experience</button><br>
+            <button onclick="addExperience()" class="add-btn">+ Add Experience</button>
 
-            <h2>Education</h2>
-            <div id="education-container">
-                <div class="entry-input">
-                    <label for="degree-0">Degree/Major:</label>
-                    <input type="text" id="degree-0" placeholder="M.S. Computer Science"><br>
-                    <label for="university-0">University:</label>
-                    <input type="text" id="university-0" placeholder="State University"><br>
-                    <button onclick="removeEducation(0)" class="remove-btn">Remove</button>
-                </div>
+            <h2><span>🎓</span> Education</h2>
+            <div id="education-container"></div>
+            <button onclick="addEducation()" class="add-btn">+ Add Education</button>
+
+            <h2><span>⚡</span> Skills</h2>
+            <div id="skills-container"></div>
+            <button onclick="addSkill()" class="add-btn">+ Add Skill</button>
+
+            <h2><span>🚀</span> Projects</h2>
+            <div id="projects-container"></div>
+            <button onclick="addProject()" class="add-btn">+ Add Project</button>
+
+            <h2><span>📜</span> Certifications</h2>
+            <div id="certifications-container"></div>
+            <button onclick="addCertification()" class="add-btn">+ Add Certification</button>
+
+            <button onclick="generateResume()" class="generate-btn">Generate Resume ✨</button>
+        </section>
+
+        <!-- Preview Section -->
+        <aside id="live-preview" class="preview-section">
+            <h2 style="margin-top: 0;">Live Preview</h2>
+            <div id="preview-content">
+                <p style="text-align: center; color: #64748b; margin-top: 2rem;">Your content will appear here as you
+                    type...</p>
             </div>
-            <button onclick="addEducation()" class="add-btn">Add Another Education</button><br>
+        </aside>
 
-            <h2>Skills</h2>
-            <div id="skills-container">
-                <div class="skill-input">
-                    <input type="text" id="skill-0" placeholder="JavaScript"><br>
-                    <button onclick="removeSkill(0)" class="remove-btn">Remove</button>
-                </div>
-            </div>
-            <button onclick="addSkill()" class="add-btn">Add Another Skill</button><br>
-
-            <h2>Projects</h2>
-            <div id="projects-container">
-                <div class="entry-input">
-                    <label for="project-name-0">Project Name:</label>
-                    <input type="text" id="project-name-0" placeholder="E-commerce Website"><br>
-                    <label for="project-desc-0">Description:</label>
-                    <textarea id="project-desc-0" rows="2" placeholder="Brief description of the project..."></textarea><br>
-                    <button onclick="removeProject(0)" class="remove-btn">Remove</button>
-                </div>
-            </div>
-            <button onclick="addProject()" class="add-btn">Add Another Project</button><br>
-
-            <h2>Certifications</h2>
-            <div id="certifications-container">
-                <div class="entry-input">
-                    <label for="cert-name-0">Certification Name:</label>
-                    <input type="text" id="cert-name-0" placeholder="AWS Certified Developer"><br>
-                    <label for="cert-issuer-0">Issuer:</label>
-                    <input type="text" id="cert-issuer-0" placeholder="Amazon Web Services"><br>
-                    <button onclick="removeCertification(0)" class="remove-btn">Remove</button>
-                </div>
-            </div>
-            <button onclick="addCertification()" class="add-btn">Add Another Certification</button><br>
-
-            <button onclick="generateResume()" class="generate-btn">Generate Resume</button>
-        </div>
-
-        <div id="live-preview" class="preview-section">
-            <h2>Live Preview</h2>
-            <div id="preview-content"></div>
-        </div>
-
-        <div id="resume-output" class="hidden">
+        <!-- Final Output View -->
+        <article id="resume-output" class="hidden">
             <header id="resume-header">
                 <h1 id="out-name"></h1>
                 <p><span id="out-email"></span> | <span id="out-phone"></span></p>
@@ -125,9 +115,9 @@
                 <div id="out-education"></div>
             </section>
 
-            <section class="section">
+            <section class="section border-none">
                 <h2>Skills</h2>
-                <ul id="out-skills"></ul>
+                <ul id="out-skills" style="list-style: none; padding: 0;"></ul>
             </section>
 
             <section class="section">
@@ -140,15 +130,18 @@
                 <div id="out-certifications"></div>
             </section>
 
-            <button onclick="window.print()" class="print-button">Print / Save as PDF 💾</button>
-            <button onclick="resetBuilder()" class="reset-button">Edit Form</button>
-        </div>
-    </div>
+            <div class="no-print" style="margin-top: 3rem; display: flex; gap: 1rem;">
+                <button onclick="window.print()" class="print-button">Download PDF 💾</button>
+                <button onclick="resetBuilder()" class="reset-button">← Edit Data</button>
+            </div>
+        </article>
+    </main>
 
     <footer class="site-footer">
-        <p>&copy; 2025 Mr.vvm</p>
+        <p>&copy; 2025 Professional Resume Builder. Created by Mr.vvm</p>
     </footer>
 
     <script src="script.js"></script>
 </body>
+
 </html>

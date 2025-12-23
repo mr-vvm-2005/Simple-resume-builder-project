@@ -1,341 +1,245 @@
-// Global variables for dynamic entries
-let experienceCount = 1;
-let educationCount = 1;
-let skillCount = 1;
-let projectCount = 1;
-let certificationCount = 1;
+// Utility to get all values from dynamic sections
+function getDynamicValues(containerId, fieldPrefixes) {
+    const container = document.getElementById(containerId);
+    const entries = container.querySelectorAll('.entry-input, .skill-input');
+    const data = [];
+
+    entries.forEach((entry) => {
+        const entryData = {};
+        fieldPrefixes.forEach(prefix => {
+            const input = entry.querySelector(`[id^="${prefix}-"]`);
+            if (input) {
+                entryData[prefix] = input.value;
+            }
+        });
+        // Special case for skills which might just be one input
+        if (fieldPrefixes.length === 1 && fieldPrefixes[0] === 'skill') {
+            const input = entry.querySelector('input');
+            if (input && input.value.trim()) data.push(input.value);
+        } else if (Object.values(entryData).some(val => val.trim() !== '')) {
+            data.push(entryData);
+        }
+    });
+    return data;
+}
 
 // Dark mode toggle
 document.getElementById('dark-mode-toggle').addEventListener('click', function() {
     document.body.classList.toggle('dark-mode');
-    this.textContent = document.body.classList.contains('dark-mode') ? '☀️ Light Mode' : '🌙 Dark Mode';
+    const isDark = document.body.classList.contains('dark-mode');
+    this.innerHTML = isDark ? '<span>☀️</span> Light Mode' : '<span>🌙</span> Dark Mode';
 });
 
-// Live preview functionality
-document.addEventListener('input', updateLivePreview);
-
+// Live preview logic
 function updateLivePreview() {
     const previewContent = document.getElementById('preview-content');
     if (!previewContent) return;
 
     const name = document.getElementById('name').value || 'Your Name';
-    const email = document.getElementById('email').value || 'your.email@example.com';
-    const phone = document.getElementById('phone').value || '(123) 456-7890';
-    const summary = document.getElementById('summary').value || 'Your professional summary...';
+    const email = document.getElementById('email').value || 'email@example.com';
+    const phone = document.getElementById('phone').value || 'Phone Number';
+    const summary = document.getElementById('summary').value || 'Your professional summary will appear here...';
 
-    previewContent.innerHTML = `
-        <header style="text-align: center; margin-bottom: 20px;">
-            <h1>${name}</h1>
-            <p>${email} | ${phone}</p>
-        </header>
-        <section>
-            <h2>Summary</h2>
-            <p>${summary}</p>
+    // Get dynamic data
+    const experiences = getDynamicValues('experience-container', ['job-title', 'company', 'exp-details']);
+    const education = getDynamicValues('education-container', ['degree', 'university']);
+    const skills = getDynamicValues('skills-container', ['skill']);
+
+    let html = `
+        <div style="text-align: center; border-bottom: 2px solid #6366f1; padding-bottom: 1rem; margin-bottom: 1.5rem;">
+            <h1 style="font-size: 2rem; margin: 0; color: #0f172a;">${name}</h1>
+            <p style="color: #64748b; margin: 5px 0;">${email} | ${phone}</p>
+        </div>
+        <section style="margin-bottom: 1.5rem;">
+            <h2 style="font-size: 1.1rem; color: #6366f1; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.3rem;">Summary</h2>
+            <p style="font-size: 0.95rem; color: #334155;">${summary}</p>
         </section>
-        <p><em>Preview updates as you type...</em></p>
     `;
-}
 
-// Dynamic entry functions
-function addExperience() {
-    const container = document.getElementById('experience-container');
-    const newEntry = document.createElement('div');
-    newEntry.className = 'entry-input';
-    newEntry.innerHTML = `
-        <label for="job-title-${experienceCount}">Job Title:</label>
-        <input type="text" id="job-title-${experienceCount}" placeholder="Senior Developer"><br>
-        <label for="company-${experienceCount}">Company:</label>
-        <input type="text" id="company-${experienceCount}" placeholder="Tech Solutions Inc."><br>
-        <label for="exp-details-${experienceCount}">Details/Achievements:</label>
-        <textarea id="exp-details-${experienceCount}" rows="2" placeholder="Key responsibilities and achievements..."></textarea><br>
-        <button onclick="removeExperience(${experienceCount})" class="remove-btn">Remove</button>
-    `;
-    container.appendChild(newEntry);
-    experienceCount++;
-}
-
-function removeExperience(index) {
-    const entry = document.getElementById(`job-title-${index}`)?.parentElement;
-    if (entry) {
-        entry.remove();
+    if (experiences.length > 0) {
+        html += `<section style="margin-bottom: 1.5rem;"><h2 style="font-size: 1.1rem; color: #6366f1; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.3rem;">Experience</h2>`;
+        experiences.forEach(exp => {
+            html += `
+                <div style="margin-bottom: 1rem;">
+                    <h3 style="font-size: 1rem; margin: 0;">${exp['job-title'] || 'Job Title'}</h3>
+                    <p style="font-style: italic; color: #64748b; font-size: 0.9rem;">${exp['company'] || 'Company'}</p>
+                </div>
+            `;
+        });
+        html += `</section>`;
     }
-}
 
-function addEducation() {
-    const container = document.getElementById('education-container');
-    const newEntry = document.createElement('div');
-    newEntry.className = 'entry-input';
-    newEntry.innerHTML = `
-        <label for="degree-${educationCount}">Degree/Major:</label>
-        <input type="text" id="degree-${educationCount}" placeholder="M.S. Computer Science"><br>
-        <label for="university-${educationCount}">University:</label>
-        <input type="text" id="university-${educationCount}" placeholder="State University"><br>
-        <button onclick="removeEducation(${educationCount})" class="remove-btn">Remove</button>
-    `;
-    container.appendChild(newEntry);
-    educationCount++;
-}
-
-function removeEducation(index) {
-    const entry = document.getElementById(`degree-${index}`)?.parentElement;
-    if (entry) {
-        entry.remove();
+    if (skills.length > 0) {
+        html += `
+            <section>
+                <h2 style="font-size: 1.1rem; color: #6366f1; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.3rem;">Skills</h2>
+                <p style="font-size: 0.95rem;">${skills.join(', ')}</p>
+            </section>
+        `;
     }
+
+    previewContent.innerHTML = html;
 }
 
-function addSkill() {
-    const container = document.getElementById('skills-container');
-    const newSkill = document.createElement('div');
-    newSkill.className = 'skill-input';
-    newSkill.innerHTML = `
-        <input type="text" id="skill-${skillCount}" placeholder="JavaScript"><br>
-        <button onclick="removeSkill(${skillCount})" class="remove-btn">Remove</button>
-    `;
-    container.appendChild(newSkill);
-    skillCount++;
-}
+// Global counters for unique IDs (to keep labels working)
+let idCounter = 100;
 
-function removeSkill(index) {
-    const skill = document.getElementById(`skill-${index}`)?.parentElement;
-    if (skill) {
-        skill.remove();
+function createEntry(type) {
+    idCounter++;
+    const div = document.createElement('div');
+    div.className = type === 'skill' ? 'skill-input' : 'entry-input';
+    
+    let content = '';
+    if (type === 'experience') {
+        content = `
+            <label>Job Title</label>
+            <input type="text" id="job-title-${idCounter}" placeholder="e.g. Senior Software Engineer">
+            <label>Company</label>
+            <input type="text" id="company-${idCounter}" placeholder="e.g. Google">
+            <label>Details</label>
+            <textarea id="exp-details-${idCounter}" rows="2" placeholder="Responsibilities and achievements..."></textarea>
+        `;
+    } else if (type === 'education') {
+        content = `
+            <label>Degree / Major</label>
+            <input type="text" id="degree-${idCounter}" placeholder="e.g. B.S. Computer Science">
+            <label>University</label>
+            <input type="text" id="university-${idCounter}" placeholder="e.g. Stanford University">
+        `;
+    } else if (type === 'skill') {
+        content = `<input type="text" id="skill-${idCounter}" placeholder="e.g. JavaScript">`;
+    } else if (type === 'project') {
+        content = `
+            <label>Project Name</label>
+            <input type="text" id="project-name-${idCounter}" placeholder="e.g. Portfolio Website">
+            <label>Description</label>
+            <textarea id="project-desc-${idCounter}" rows="2" placeholder="Short description..."></textarea>
+        `;
+    } else if (type === 'certification') {
+        content = `
+            <label>Certification Name</label>
+            <input type="text" id="cert-name-${idCounter}" placeholder="e.g. AWS Certified Developer">
+            <label>Issuer</label>
+            <input type="text" id="cert-issuer-${idCounter}" placeholder="e.g. Amazon Web Services">
+        `;
     }
+
+    div.innerHTML = content + `<button class="remove-btn" onclick="this.parentElement.remove(); updateLivePreview();">Remove</button>`;
+    return div;
 }
 
-function addProject() {
-    const container = document.getElementById('projects-container');
-    const newEntry = document.createElement('div');
-    newEntry.className = 'entry-input';
-    newEntry.innerHTML = `
-        <label for="project-name-${projectCount}">Project Name:</label>
-        <input type="text" id="project-name-${projectCount}" placeholder="E-commerce Website"><br>
-        <label for="project-desc-${projectCount}">Description:</label>
-        <textarea id="project-desc-${projectCount}" rows="2" placeholder="Brief description of the project..."></textarea><br>
-        <button onclick="removeProject(${projectCount})" class="remove-btn">Remove</button>
-    `;
-    container.appendChild(newEntry);
-    projectCount++;
-}
+// Button click handlers
+function addExperience() { document.getElementById('experience-container').appendChild(createEntry('experience')); }
+function addEducation() { document.getElementById('education-container').appendChild(createEntry('education')); }
+function addSkill() { document.getElementById('skills-container').appendChild(createEntry('skill')); }
+function addProject() { document.getElementById('projects-container').appendChild(createEntry('project')); }
+function addCertification() { document.getElementById('certifications-container').appendChild(createEntry('certification')); }
 
-function removeProject(index) {
-    const entry = document.getElementById(`project-name-${index}`).parentElement;
-    entry.remove();
-}
-
-function addCertification() {
-    const container = document.getElementById('certifications-container');
-    const newEntry = document.createElement('div');
-    newEntry.className = 'entry-input';
-    newEntry.innerHTML = `
-        <label for="cert-name-${certificationCount}">Certification Name:</label>
-        <input type="text" id="cert-name-${certificationCount}" placeholder="AWS Certified Developer"><br>
-        <label for="cert-issuer-${certificationCount}">Issuer:</label>
-        <input type="text" id="cert-issuer-${certificationCount}" placeholder="Amazon Web Services"><br>
-        <button onclick="removeCertification(${certificationCount})" class="remove-btn">Remove</button>
-    `;
-    container.appendChild(newEntry);
-    certificationCount++;
-}
-
-function removeCertification(index) {
-    const entry = document.getElementById(`cert-name-${index}`)?.parentElement;
-    if (entry) {
-        entry.remove();
-    }
-}
-
+// Form generation
 function generateResume() {
-    // Get DOM elements
-    const form = document.getElementById('input-form');
-    const resumeOutput = document.getElementById('resume-output');
-    const livePreview = document.getElementById('live-preview');
-
-    // Personal Info
     const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const phone = document.getElementById('phone').value;
-    const summary = document.getElementById('summary').value;
-
-    // Social Links
-    const linkedin = document.getElementById('linkedin').value;
-    const github = document.getElementById('github').value;
-    const portfolio = document.getElementById('portfolio').value;
-
-    // Basic Validation
-    if (name.trim() === '') {
-        alert('Please enter your full name to generate the resume.');
+    if (!name) {
+        alert('Please enter at least your name.');
         return;
     }
 
-    // Populate Resume Output
+    // Populate the final resume
     document.getElementById('out-name').textContent = name;
-    document.getElementById('out-email').textContent = email;
-    document.getElementById('out-phone').textContent = phone;
-    document.getElementById('out-summary').textContent = summary;
+    document.getElementById('out-email').textContent = document.getElementById('email').value;
+    document.getElementById('out-phone').textContent = document.getElementById('phone').value;
+    document.getElementById('out-summary').textContent = document.getElementById('summary').value;
 
     // Social Links
     const socialLinks = document.getElementById('out-social-links');
     socialLinks.innerHTML = '';
-    if (linkedin) socialLinks.innerHTML += `<a href="${linkedin}" target="_blank">LinkedIn</a> `;
-    if (github) socialLinks.innerHTML += `<a href="${github}" target="_blank">GitHub</a> `;
-    if (portfolio) socialLinks.innerHTML += `<a href="${portfolio}" target="_blank">Portfolio</a>`;
+    ['linkedin', 'github', 'portfolio'].forEach(id => {
+        const val = document.getElementById(id).value;
+        if (val) {
+            const label = id.charAt(0).toUpperCase() + id.slice(1);
+            socialLinks.innerHTML += `<a href="${val}" target="_blank" style="margin-right: 15px; color: #6366f1; text-decoration: none; font-weight: 500;">${label}</a> `;
+        }
+    });
 
     // Experience
-    const outExperience = document.getElementById('out-experience');
-    outExperience.innerHTML = '';
-    for (let i = 0; i < experienceCount; i++) {
-        const jobTitle = document.getElementById(`job-title-${i}`)?.value;
-        const company = document.getElementById(`company-${i}`)?.value;
-        const expDetails = document.getElementById(`exp-details-${i}`)?.value;
-        if (jobTitle || company) {
-            const entry = document.createElement('div');
-            entry.className = 'entry';
-            entry.innerHTML = `
-                <h3>${jobTitle || 'Job Title'}</h3>
-                <p class="subtitle">${company || 'Company'}</p>
-                <ul>${expDetails ? expDetails.split('\n').filter(line => line.trim()).map(line => `<li>${line.trim()}</li>`).join('') : ''}</ul>
-            `;
-            outExperience.appendChild(entry);
-        }
-    }
+    const outExp = document.getElementById('out-experience');
+    outExp.innerHTML = '';
+    getDynamicValues('experience-container', ['job-title', 'company', 'exp-details']).forEach(exp => {
+        const div = document.createElement('div');
+        div.className = 'entry';
+        div.innerHTML = `
+            <h3>${exp['job-title']}</h3>
+            <p class="subtitle">${exp['company']}</p>
+            <div style="white-space: pre-line; color: #475569; margin-top: 0.5rem;">${exp['exp-details']}</div>
+        `;
+        outExp.appendChild(div);
+    });
 
     // Education
-    const outEducation = document.getElementById('out-education');
-    outEducation.innerHTML = '';
-    for (let i = 0; i < educationCount; i++) {
-        const degree = document.getElementById(`degree-${i}`)?.value;
-        const university = document.getElementById(`university-${i}`)?.value;
-        if (degree || university) {
-            const entry = document.createElement('div');
-            entry.className = 'entry';
-            entry.innerHTML = `
-                <h3>${degree || 'Degree'}</h3>
-                <p class="subtitle">${university || 'University'}</p>
-            `;
-            outEducation.appendChild(entry);
-        }
-    }
+    const outEdu = document.getElementById('out-education');
+    outEdu.innerHTML = '';
+    getDynamicValues('education-container', ['degree', 'university']).forEach(edu => {
+        const div = document.createElement('div');
+        div.className = 'entry';
+        div.innerHTML = `
+            <h3>${edu['degree']}</h3>
+            <p class="subtitle">${edu['university']}</p>
+        `;
+        outEdu.appendChild(div);
+    });
 
     // Skills
     const outSkills = document.getElementById('out-skills');
     outSkills.innerHTML = '';
-    for (let i = 0; i < skillCount; i++) {
-        const skill = document.getElementById(`skill-${i}`)?.value;
-        if (skill) {
-            const li = document.createElement('li');
-            li.textContent = skill;
-            outSkills.appendChild(li);
-        }
-    }
+    getDynamicValues('skills-container', ['skill']).forEach(skill => {
+        const li = document.createElement('li');
+        li.textContent = skill;
+        li.style.display = 'inline-block';
+        li.style.background = '#f1f5f9';
+        li.style.padding = '0.3rem 0.8rem';
+        li.style.borderRadius = '99px';
+        li.style.margin = '0 0.5rem 0.5rem 0';
+        li.style.fontSize = '0.9rem';
+        outSkills.appendChild(li);
+    });
 
     // Projects
     const outProjects = document.getElementById('out-projects');
     outProjects.innerHTML = '';
-    for (let i = 0; i < projectCount; i++) {
-        const projectName = document.getElementById(`project-name-${i}`)?.value;
-        const projectDesc = document.getElementById(`project-desc-${i}`)?.value;
-        if (projectName || projectDesc) {
-            const entry = document.createElement('div');
-            entry.className = 'entry';
-            entry.innerHTML = `
-                <h3>${projectName || 'Project Name'}</h3>
-                <p>${projectDesc || 'Description'}</p>
-            `;
-            outProjects.appendChild(entry);
-        }
-    }
+    getDynamicValues('projects-container', ['project-name', 'project-desc']).forEach(proj => {
+        const div = document.createElement('div');
+        div.className = 'entry';
+        div.innerHTML = `
+            <h3>${proj['project-name']}</h3>
+            <p style="color: #475569;">${proj['project-desc']}</p>
+        `;
+        outProjects.appendChild(div);
+    });
 
-    // Certifications
-    const outCertifications = document.getElementById('out-certifications');
-    outCertifications.innerHTML = '';
-    for (let i = 0; i < certificationCount; i++) {
-        const certName = document.getElementById(`cert-name-${i}`)?.value;
-        const certIssuer = document.getElementById(`cert-issuer-${i}`)?.value;
-        if (certName || certIssuer) {
-            const entry = document.createElement('div');
-            entry.className = 'entry';
-            entry.innerHTML = `
-                <h3>${certName || 'Certification'}</h3>
-                <p class="subtitle">${certIssuer || 'Issuer'}</p>
-            `;
-            outCertifications.appendChild(entry);
-        }
-    }
+    // Certs
+    const outCerts = document.getElementById('out-certifications');
+    outCerts.innerHTML = '';
+    getDynamicValues('certifications-container', ['cert-name', 'cert-issuer']).forEach(cert => {
+        const div = document.createElement('div');
+        div.className = 'entry';
+        div.innerHTML = `
+            <h3>${cert['cert-name']}</h3>
+            <p class="subtitle">${cert['cert-issuer']}</p>
+        `;
+        outCerts.appendChild(div);
+    });
 
-    // Toggle Views
-    form.classList.add('hidden');
-    livePreview.classList.add('hidden');
-    resumeOutput.classList.remove('hidden');
+    document.getElementById('input-form').classList.add('hidden');
+    document.getElementById('live-preview').classList.add('hidden');
+    document.getElementById('resume-output').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function resetBuilder() {
-    const form = document.getElementById('input-form');
-    const resumeOutput = document.getElementById('resume-output');
-    const livePreview = document.getElementById('live-preview');
-
-    // Reset counts and clear dynamic entries
-    experienceCount = 1;
-    educationCount = 1;
-    skillCount = 1;
-    projectCount = 1;
-    certificationCount = 1;
-
-    document.getElementById('experience-container').innerHTML = `
-        <div class="entry-input">
-            <label for="job-title-0">Job Title:</label>
-            <input type="text" id="job-title-0" placeholder="Senior Developer"><br>
-            <label for="company-0">Company:</label>
-            <input type="text" id="company-0" placeholder="Tech Solutions Inc."><br>
-            <label for="exp-details-0">Details/Achievements:</label>
-            <textarea id="exp-details-0" rows="2" placeholder="Key responsibilities and achievements..."></textarea><br>
-            <button onclick="removeExperience(0)" class="remove-btn">Remove</button>
-        </div>
-    `;
-
-    document.getElementById('education-container').innerHTML = `
-        <div class="entry-input">
-            <label for="degree-0">Degree/Major:</label>
-            <input type="text" id="degree-0" placeholder="M.S. Computer Science"><br>
-            <label for="university-0">University:</label>
-            <input type="text" id="university-0" placeholder="State University"><br>
-            <button onclick="removeEducation(0)" class="remove-btn">Remove</button>
-        </div>
-    `;
-
-    document.getElementById('skills-container').innerHTML = `
-        <div class="skill-input">
-            <input type="text" id="skill-0" placeholder="JavaScript"><br>
-            <button onclick="removeSkill(0)" class="remove-btn">Remove</button>
-        </div>
-    `;
-
-    document.getElementById('projects-container').innerHTML = `
-        <div class="entry-input">
-            <label for="project-name-0">Project Name:</label>
-            <input type="text" id="project-name-0" placeholder="E-commerce Website"><br>
-            <label for="project-desc-0">Description:</label>
-            <textarea id="project-desc-0" rows="2" placeholder="Brief description of the project..."></textarea><br>
-            <button onclick="removeProject(0)" class="remove-btn">Remove</button>
-        </div>
-    `;
-
-    document.getElementById('certifications-container').innerHTML = `
-        <div class="entry-input">
-            <label for="cert-name-0">Certification Name:</label>
-            <input type="text" id="cert-name-0" placeholder="AWS Certified Developer"><br>
-            <label for="cert-issuer-0">Issuer:</label>
-            <input type="text" id="cert-issuer-0" placeholder="Amazon Web Services"><br>
-            <button onclick="removeCertification(0)" class="remove-btn">Remove</button>
-        </div>
-    `;
-
-    // Toggle Views
-    form.classList.remove('hidden');
-    livePreview.classList.remove('hidden');
-    resumeOutput.classList.add('hidden');
+    document.getElementById('input-form').classList.remove('hidden');
+    document.getElementById('live-preview').classList.remove('hidden');
+    document.getElementById('resume-output').classList.add('hidden');
 }
 
-// Initialize live preview on page load
-document.addEventListener('DOMContentLoaded', function() {
-    updateLivePreview();
-});
+// Initial event listeners
+document.addEventListener('input', updateLivePreview);
+document.addEventListener('DOMContentLoaded', updateLivePreview);
